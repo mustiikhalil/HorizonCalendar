@@ -261,6 +261,8 @@ public final class CalendarView: UIView {
     switch anchorLayoutItem?.itemType {
     case .monthHeader(let month):
       isAnchorLayoutItemValid = content.monthRange.contains(month)
+    case .monthFooter(let month):
+      isAnchorLayoutItemValid = content.monthRange.contains(month)
     case .dayOfWeekInMonth(_, let month):
       isAnchorLayoutItemValid = content.monthRange.contains(month)
     case .day(let day):
@@ -442,7 +444,8 @@ public final class CalendarView: UIView {
         size: bounds.size,
         layoutMargins: directionalLayoutMargins,
         scale: scale,
-        monthHeaderHeight: monthHeaderHeight())
+        monthHeaderHeight: monthHeaderHeight(),
+        monthFooterHeight: monthFooterHeight())
       _visibleItemsProvider = visibleItemsProvider
       return visibleItemsProvider
     }
@@ -470,6 +473,7 @@ public final class CalendarView: UIView {
       x: scrollView.contentOffset.x + directionalLayoutMargins.leading,
       y: scrollView.contentOffset.y + directionalLayoutMargins.top)
 
+    print("target layout here! : \(scrollToItemContext)")
     switch scrollToItemContext.targetItem {
     case .month(let month):
       return visibleItemsProvider.anchorMonthHeaderItem(
@@ -527,6 +531,25 @@ public final class CalendarView: UIView {
     let firstMonthHeaderItemModel = content.monthHeaderItemModelProvider(
       content.monthRange.lowerBound)
     let firstMonthHeader = firstMonthHeaderItemModel.makeView()
+    firstMonthHeaderItemModel.setViewModelOnViewOfSameType(firstMonthHeader)
+
+    let size = firstMonthHeader.systemLayoutSizeFitting(
+      CGSize(width: monthWidth, height: 0),
+      withHorizontalFittingPriority: .required,
+      verticalFittingPriority: .fittingSizeLevel)
+    return size.height
+  }
+    
+  private func monthFooterHeight() -> CGFloat {
+    let monthWidth: CGFloat
+    switch content.monthsLayout {
+    case .vertical: monthWidth = bounds.width
+    case .horizontal(let _monthWidth): monthWidth = _monthWidth
+    }
+    let firstMonthHeaderItemModel = content.monthFooterItemModelProvidor(
+      content.monthRange.lowerBound)
+    let firstMonthHeader = firstMonthHeaderItemModel.makeView()
+    
     firstMonthHeaderItemModel.setViewModelOnViewOfSameType(firstMonthHeader)
 
     let size = firstMonthHeader.systemLayoutSizeFitting(

@@ -68,6 +68,8 @@ final class LayoutItemTypeEnumerator {
     switch itemType {
     case .monthHeader(let month):
       return monthRange.contains(month)
+    case .monthFooter(let month):
+      return monthRange.contains(month)
     case .dayOfWeekInMonth(_, let month):
       return monthRange.contains(month)
     case .day(let day):
@@ -81,7 +83,10 @@ final class LayoutItemTypeEnumerator {
       let previousMonth = calendar.month(byAddingMonths: -1, to: month)
       let lastDateOfPreviousMonth = calendar.lastDate(of: previousMonth)
       return .day(calendar.day(containing: lastDateOfPreviousMonth))
-
+    case .monthFooter(let month):
+      let previousMonth = calendar.month(byAddingMonths: -1, to: month)
+      let lastDateOfPreviousMonth = calendar.lastDate(of: previousMonth)
+      return .day(calendar.day(containing: lastDateOfPreviousMonth))
     case let .dayOfWeekInMonth(position, month):
       if position == .first {
         return .monthHeader(month)
@@ -95,7 +100,7 @@ final class LayoutItemTypeEnumerator {
     case .day(let day):
       if day.day == 1 || day == dayRange.lowerBound {
         if case .vertical(let options) = monthsLayout, options.pinDaysOfWeekToTop {
-          return .monthHeader(day.month)
+          return .monthFooter(day.month)
         } else {
           return .dayOfWeekInMonth(position: .last, month: day.month)
         }
@@ -114,6 +119,13 @@ final class LayoutItemTypeEnumerator {
         return .dayOfWeekInMonth(position: .first, month: month)
       }
 
+    case .monthFooter(let month):
+    if case .vertical(let options) = monthsLayout, options.pinDaysOfWeekToTop {
+      return .day(firstDayInRange(in: month))
+    } else {
+      return .dayOfWeekInMonth(position: .first, month: month)
+    }
+
     case let .dayOfWeekInMonth(position, month):
       if position == .last {
         return .day(firstDayInRange(in: month))
@@ -127,10 +139,10 @@ final class LayoutItemTypeEnumerator {
     case .day(let day):
       let nextDay = calendar.day(byAddingDays: 1, to: day)
       if day.month != nextDay.month {
-        return .monthHeader(nextDay.month)
+        return .monthFooter(nextDay.month)
       } else if day == dayRange.upperBound {
         let nextMonth = calendar.month(byAddingMonths: 1, to: nextDay.month)
-        return .monthHeader(nextMonth)
+        return .monthFooter(nextMonth)
       } else {
         return .day(nextDay)
       }

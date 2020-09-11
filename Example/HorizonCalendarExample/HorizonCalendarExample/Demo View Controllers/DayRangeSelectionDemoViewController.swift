@@ -168,6 +168,55 @@ final class DayRangeSelectionDemoViewController: UIViewController, DemoViewContr
           viewModel: .init(
             framesOfDaysToHighlight: dayRangeLayoutContext.daysAndFrames.map { $0.frame }))
       }
+      .withMonthFooterItemModelProvider { (month) -> AnyCalendarItemModel in
+        return CalendarItemModel<SomeView>(
+          invariantViewProperties: .init(),
+          viewModel: .init())
+      }
+  }
+}
+
+class SomeView: UIView {
+
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    print("here!!")
+  }
+}
+
+extension SomeView: CalendarItemViewRepresentable {
+
+  struct InvariantViewProperties: Hashable {
+    
+  }
+
+  struct Footer: Hashable {
+    
+  }
+
+  var _itemViewDifferentiator: _CalendarItemViewDifferentiator {
+    .viewRepresentable(viewRepresentableTypeDescription: "some view",
+                       viewTypeDescription: "some",
+                       invariantViewProperties: Footer.init())
+  }
+
+  static func makeView(withInvariantViewProperties invariantViewProperties: InvariantViewProperties) -> SomeView {
+    let view = SomeView(frame: .init(x: 0, y: 0, width: 100, height: 100))
+    view.backgroundColor = .red
+    return view
+  }
+
+  static func setViewModel(_ viewModel: Footer, on view: SomeView) {
+    
   }
 
 }

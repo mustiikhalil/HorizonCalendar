@@ -68,6 +68,11 @@ public final class CalendarViewContent {
         dateFormatter: monthHeaderDateFormatter)
       return .itemModel(itemModel)
     }
+    
+    monthFooterItemModelProvidor = { month in
+      let itemModel = CalendarViewContent.defaultMonthFooterItemModelProvider()
+      return .itemModel(itemModel)
+    }
 
     dayOfWeekItemModelProvider = { _, weekdayIndex in
       let itemModel = CalendarViewContent.defaultDayOfWeekItemModelProvider(
@@ -186,6 +191,14 @@ public final class CalendarViewContent {
     -> CalendarViewContent
   {
     self.monthHeaderItemModelProvider = { .itemModel(monthHeaderItemModelProvider($0)) }
+    return self
+  }
+    
+  public func withMonthFooterItemModelProvider(
+    _ monthFooterItemModelProvidor: @escaping (_ month: Month) -> AnyCalendarItemModel)
+    -> CalendarViewContent
+  {
+    self.monthFooterItemModelProvidor = { .itemModel(monthFooterItemModelProvidor($0)) }
     return self
   }
 
@@ -322,6 +335,7 @@ public final class CalendarViewContent {
 
   // TODO(BK): Make all item provider closures private(set) after legacy `CalendarItem` is removed.
   var monthHeaderItemModelProvider: (Month) -> InternalAnyCalendarItemModel
+  var monthFooterItemModelProvidor: (Month) -> InternalAnyCalendarItemModel
   var dayOfWeekItemModelProvider: (
     _ month: Month?,
     _ weekdayIndex: Int)

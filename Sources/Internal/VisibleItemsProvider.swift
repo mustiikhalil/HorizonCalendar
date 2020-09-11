@@ -28,7 +28,8 @@ final class VisibleItemsProvider {
     size: CGSize,
     layoutMargins: NSDirectionalEdgeInsets,
     scale: CGFloat,
-    monthHeaderHeight: CGFloat)
+    monthHeaderHeight: CGFloat,
+    monthFooterHeight: CGFloat)
   {
     self.content = content
     layoutItemTypeEnumerator = LayoutItemTypeEnumerator(
@@ -41,7 +42,8 @@ final class VisibleItemsProvider {
       size: size,
       layoutMargins: layoutMargins,
       scale: scale,
-      monthHeaderHeight: monthHeaderHeight)
+      monthHeaderHeight: monthHeaderHeight,
+      monthFooterHeight: monthFooterHeight)
   }
 
   // MARK: Internal
@@ -270,6 +272,9 @@ final class VisibleItemsProvider {
       case .monthHeader(let _month):
         month = _month
         calendarItemModel = self.content.monthHeaderItemModelProvider(month)
+      case .monthFooter(let _month):
+        month = _month
+        calendarItemModel = self.content.monthFooterItemModelProvidor(month)
       case .day(let day):
         month = day.month
         calendarItemModel = self.content.dayItemModelProvider(day)
@@ -420,6 +425,12 @@ final class VisibleItemsProvider {
     switch itemType {
     case .monthHeader:
       frame = frameProvider.frameOfMonthHeader(inMonthWithOrigin: monthOrigin)
+    case .monthFooter(let month):
+      print("layoutItem footer!")
+      frame = frameProvider.frameOfMonthFooter(
+        month,
+        withFrame: lastHandledLayoutItem.frame,
+        inMonthWithOrigin: monthOrigin)
     case .dayOfWeekInMonth(let position, _):
       frame = frameProvider.frameOfDayOfWeek(at: position, inMonthWithOrigin: monthOrigin)
     case .day(let day):
@@ -650,6 +661,14 @@ final class VisibleItemsProvider {
                   inMonthWithOrigin: monthFrame.origin,
                   separatorHeight: separatorOptions.height)))
           }
+        case .monthFooter(let month):
+            print("footer here!!!: \(month)")
+            calendarItemModel = calendarItemModelCache.value(
+              for: itemType,
+              missingValueProvider: {
+                previousCalendarItemModelCache?[itemType]
+                  ?? content.monthFooterItemModelProvidor(month)
+              })
 
         case let .dayOfWeekInMonth(dayOfWeekPosition, month):
           calendarItemModel = calendarItemModelCache.value(

@@ -28,14 +28,15 @@ struct LayoutItem {
 extension LayoutItem {
 
   enum ItemType: Equatable, Hashable {
-
     case monthHeader(Month)
+    case monthFooter(Month)
     case dayOfWeekInMonth(position: DayOfWeekPosition, month: Month)
     case day(Day)
 
     var month: Month {
       switch self {
       case .monthHeader(let month): return month
+      case .monthFooter(let month): return month
       case .dayOfWeekInMonth(_, let month): return month
       case .day(let day): return day.month
       }
@@ -53,9 +54,20 @@ extension LayoutItem.ItemType: Comparable {
     switch (lhs, rhs) {
     case let (.monthHeader(lhsMonth), .monthHeader(rhsMonth)):
       return lhsMonth < rhsMonth
+    case let (.monthHeader(lhsMonth), .monthFooter(rhsMonth)):
+      return lhsMonth < rhsMonth
     case let (.monthHeader(lhsMonth), .dayOfWeekInMonth(_, rhsMonth)):
       return lhsMonth <= rhsMonth
     case let (.monthHeader(lhsMonth), .day(rhsDay)):
+      return lhsMonth <= rhsDay.month
+
+    case let (.monthFooter(lhsMonth), .monthFooter(rhsMonth)):
+      return lhsMonth < rhsMonth
+    case let (.monthFooter(lhsMonth), .monthHeader(rhsMonth)):
+      return lhsMonth < rhsMonth
+    case let (.monthFooter(lhsMonth), .dayOfWeekInMonth(_, rhsMonth)):
+      return lhsMonth <= rhsMonth
+    case let (.monthFooter(lhsMonth), .day(rhsDay)):
       return lhsMonth <= rhsDay.month
 
     case let (
@@ -64,12 +76,16 @@ extension LayoutItem.ItemType: Comparable {
       return lhsMonth < rhsMonth || (lhsMonth == rhsMonth && lhsPosition < rhsPosition)
     case let (.dayOfWeekInMonth(_, lhsMonth), .monthHeader(rhsMonth)):
       return lhsMonth < rhsMonth
+    case let (.dayOfWeekInMonth(_, lhsMonth), .monthFooter(rhsMonth)):
+      return lhsMonth < rhsMonth
     case let (.dayOfWeekInMonth(_, lhsMonth), .day(rhsDay)):
       return lhsMonth <= rhsDay.month
 
     case let (.day(lhsDay), .day(rhsDay)):
       return lhsDay < rhsDay
     case let (.day(lhsDay), .monthHeader(rhsMonth)):
+      return lhsDay.month < rhsMonth
+    case let (.day(lhsDay), .monthFooter(rhsMonth)):
       return lhsDay.month < rhsMonth
     case let (.day(lhsDay), .dayOfWeekInMonth(_, rhsMonth)):
       return lhsDay.month < rhsMonth

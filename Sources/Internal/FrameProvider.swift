@@ -27,14 +27,16 @@ final class FrameProvider {
     size: CGSize,
     layoutMargins: NSDirectionalEdgeInsets,
     scale: CGFloat,
-    monthHeaderHeight: CGFloat)
+    monthHeaderHeight: CGFloat,
+    monthFooterHeight: CGFloat)
   {
     self.content = content
     self.size = size
     self.layoutMargins = layoutMargins
     self.scale = scale
     self.monthHeaderHeight = monthHeaderHeight
-
+    self.monthFooterHeight = monthFooterHeight
+    
     switch content.monthsLayout {
     case .vertical:
       monthWidth = size.width - layoutMargins.leading - layoutMargins.trailing
@@ -62,7 +64,7 @@ final class FrameProvider {
 
   func originOfMonth(containing layoutItem: LayoutItem) -> CGPoint {
     switch layoutItem.itemType {
-    case .monthHeader:
+    case .monthHeader, .monthFooter:
       return layoutItem.frame.origin
 
     case .dayOfWeekInMonth(let position, _):
@@ -124,6 +126,14 @@ final class FrameProvider {
 
   func frameOfMonthHeader(inMonthWithOrigin monthOrigin: CGPoint) -> CGRect {
     CGRect(origin: monthOrigin, size: CGSize(width: monthWidth, height: monthHeaderHeight))
+  }
+
+  func frameOfMonthFooter(
+    _ month: Month,
+    withFrame adjacentDayFrame: CGRect,
+    inMonthWithOrigin monthOrigin: CGPoint
+  ) -> CGRect {
+    return CGRect(x: 0, y: 0, width: 0, height: 0)
   }
 
   func frameOfDayOfWeek(
@@ -245,6 +255,7 @@ final class FrameProvider {
   private let content: CalendarViewContent
   private let monthWidth: CGFloat
   private let monthHeaderHeight: CGFloat
+  private let monthFooterHeight: CGFloat
 
   private var calendar: Calendar {
     content.calendar

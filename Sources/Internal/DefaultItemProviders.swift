@@ -15,6 +15,20 @@
 
 import UIKit
 
+// MARK: - EmptyView
+
+struct EmptyView: CalendarItemViewRepresentable {
+    struct InvariantViewProperties: Hashable {}
+    struct ViewModel: Equatable {}
+    
+    static func makeView(
+      withInvariantViewProperties invariantViewProperties: InvariantViewProperties)
+      -> UIView
+    { return UIView(frame: .init(x: 0, y: 0, width: 0, height: 0)) }
+    
+    static func setViewModel(_ viewModel: ViewModel, on view: UIView) {}
+}
+
 // MARK: - DefaultLabel
 
 struct DefaultLabelRepresenting: CalendarItemViewRepresentable {
@@ -86,6 +100,13 @@ extension CalendarViewContent {
         isAccessibilityElement: true,
         accessibilityTraits: [.header]),
       viewModel: .init(text: monthText, accessibilityLabel: monthText))
+  }
+
+  static func defaultMonthFooterItemModelProvider() -> AnyCalendarItemModel
+  {
+    return CalendarItemModel<EmptyView>(
+        invariantViewProperties: .init(),
+        viewModel: .init())
   }
 
   static func defaultDayOfWeekItemModelProvider(
