@@ -24,11 +24,12 @@ final class LayoutItemTypeEnumerator {
 
   // MARK: Lifecycle
 
-  init(calendar: Calendar, monthsLayout: MonthsLayout, monthRange: MonthRange, dayRange: DayRange) {
+  init(calendar: Calendar, monthsLayout: MonthsLayout, monthRange: MonthRange, dayRange: DayRange, shouldGenerateFooter: Bool) {
     self.calendar = calendar
     self.monthsLayout = monthsLayout
     self.monthRange = monthRange
     self.dayRange = dayRange
+    self.shouldGenerateFooter = shouldGenerateFooter
   }
 
   // MARK: Internal
@@ -63,6 +64,7 @@ final class LayoutItemTypeEnumerator {
   private let monthsLayout: MonthsLayout
   private let monthRange: MonthRange
   private let dayRange: DayRange
+  private let shouldGenerateFooter: Bool
 
   private func isItemTypeInRange(_ itemType: LayoutItem.ItemType) -> Bool {
     switch itemType {
@@ -123,7 +125,7 @@ final class LayoutItemTypeEnumerator {
     if case .vertical(let options) = monthsLayout, options.pinDaysOfWeekToTop {
       return .day(firstDayInRange(in: month))
     } else {
-      return .dayOfWeekInMonth(position: .first, month: month)
+      return .dayOfWeekInMonth(position: .last, month: month)
     }
 
     case let .dayOfWeekInMonth(position, month):
@@ -137,12 +139,12 @@ final class LayoutItemTypeEnumerator {
       }
 
     case .day(let day):
+      // TODO: - look into how this actually works
       let nextDay = calendar.day(byAddingDays: 1, to: day)
-      if day.month != nextDay.month {
+      if day.month != nextDay.month && shouldGenerateFooter {
         return .monthFooter(nextDay.month)
       } else if day == dayRange.upperBound {
-        let nextMonth = calendar.month(byAddingMonths: 1, to: nextDay.month)
-        return .monthFooter(nextMonth)
+        return .monthFooter(day.month)
       } else {
         return .day(nextDay)
       }

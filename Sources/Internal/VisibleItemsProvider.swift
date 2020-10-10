@@ -427,10 +427,11 @@ final class VisibleItemsProvider {
       frame = frameProvider.frameOfMonthHeader(inMonthWithOrigin: monthOrigin)
     case .monthFooter(let month):
       print("layoutItem footer!")
-      frame = frameProvider.frameOfMonthFooter(
-        month,
-        withFrame: lastHandledLayoutItem.frame,
-        inMonthWithOrigin: monthOrigin)
+      frame = frameProvider.frameOfMonthHeader(inMonthWithOrigin: monthOrigin)
+//        .frameOfMonthFooter(
+//        month,
+//        withFrame: lastHandledLayoutItem.frame,
+//        inMonthWithOrigin: monthOrigin)
     case .dayOfWeekInMonth(let position, _):
       frame = frameProvider.frameOfDayOfWeek(at: position, inMonthWithOrigin: monthOrigin)
     case .day(let day):

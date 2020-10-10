@@ -133,7 +133,8 @@ final class FrameProvider {
     withFrame adjacentDayFrame: CGRect,
     inMonthWithOrigin monthOrigin: CGPoint
   ) -> CGRect {
-    return CGRect(x: 0, y: 0, width: 0, height: 0)
+    let y = adjacentDayFrame.maxY + 20 + adjacentDayFrame.origin.y
+    return CGRect(x: 0, y: y, width: monthWidth, height: monthFooterHeight)
   }
 
   func frameOfDayOfWeek(
