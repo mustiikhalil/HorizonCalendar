@@ -473,7 +473,6 @@ public final class CalendarView: UIView {
       x: scrollView.contentOffset.x + directionalLayoutMargins.leading,
       y: scrollView.contentOffset.y + directionalLayoutMargins.top)
 
-    print("target layout here! : \(scrollToItemContext)")
     switch scrollToItemContext.targetItem {
     case .month(let month):
       return visibleItemsProvider.anchorMonthHeaderItem(

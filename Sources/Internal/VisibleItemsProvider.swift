@@ -36,7 +36,8 @@ final class VisibleItemsProvider {
       calendar: calendar,
       monthsLayout: content.monthsLayout,
       monthRange: content.monthRange,
-      dayRange: content.dayRange)
+      dayRange: content.dayRange,
+      shouldGenerateFooter: monthFooterHeight > 0)
     frameProvider = FrameProvider(
       content: content,
       size: size,
@@ -425,13 +426,12 @@ final class VisibleItemsProvider {
     switch itemType {
     case .monthHeader:
       frame = frameProvider.frameOfMonthHeader(inMonthWithOrigin: monthOrigin)
+      print("monthHeader frame: \(frame)")
     case .monthFooter(let month):
-      print("layoutItem footer!")
-      frame = frameProvider.frameOfMonthHeader(inMonthWithOrigin: monthOrigin)
-//        .frameOfMonthFooter(
-//        month,
-//        withFrame: lastHandledLayoutItem.frame,
-//        inMonthWithOrigin: monthOrigin)
+      frame = frameProvider.frameOfMonthFooter(month,
+                                               withFrame: lastHandledLayoutItem.frame,
+                                               inMonthWithOrigin: monthOrigin)
+      print("monthFooter frame: \(frame)")
     case .dayOfWeekInMonth(let position, _):
       frame = frameProvider.frameOfDayOfWeek(at: position, inMonthWithOrigin: monthOrigin)
     case .day(let day):
@@ -451,7 +451,6 @@ final class VisibleItemsProvider {
         frame = frameProvider.frameOfDay(day, inMonthWithOrigin: monthOrigin)
       }
     }
-
     return LayoutItem(itemType: itemType, frame: frame)
   }
 
@@ -663,7 +662,7 @@ final class VisibleItemsProvider {
                   separatorHeight: separatorOptions.height)))
           }
         case .monthFooter(let month):
-            print("footer here!!!: \(month)")
+            print("month for footer: \(month)")
             calendarItemModel = calendarItemModelCache.value(
               for: itemType,
               missingValueProvider: {

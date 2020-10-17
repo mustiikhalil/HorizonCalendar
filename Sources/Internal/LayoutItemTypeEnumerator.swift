@@ -82,10 +82,12 @@ final class LayoutItemTypeEnumerator {
   private func previousItemType(from itemType: LayoutItem.ItemType) -> LayoutItem.ItemType {
     switch itemType {
     case .monthHeader(let month):
+      // TODO: - check if we need to generate the footer here!
       let previousMonth = calendar.month(byAddingMonths: -1, to: month)
       let lastDateOfPreviousMonth = calendar.lastDate(of: previousMonth)
       return .day(calendar.day(containing: lastDateOfPreviousMonth))
     case .monthFooter(let month):
+
       let previousMonth = calendar.month(byAddingMonths: -1, to: month)
       let lastDateOfPreviousMonth = calendar.lastDate(of: previousMonth)
       return .day(calendar.day(containing: lastDateOfPreviousMonth))
@@ -113,6 +115,7 @@ final class LayoutItemTypeEnumerator {
   }
 
   private func nextItemType(from itemType: LayoutItem.ItemType) -> LayoutItem.ItemType {
+
     switch itemType {
     case .monthHeader(let month):
       if case .vertical(let options) = monthsLayout, options.pinDaysOfWeekToTop {
@@ -122,10 +125,12 @@ final class LayoutItemTypeEnumerator {
       }
 
     case .monthFooter(let month):
+      let nextDay = calendar.day(byAddingDays: 1, to: lastDateInRange(in: month))
     if case .vertical(let options) = monthsLayout, options.pinDaysOfWeekToTop {
-      return .day(firstDayInRange(in: month))
+      return .monthHeader(nextDay.month)
     } else {
-      return .dayOfWeekInMonth(position: .last, month: month)
+      let nextMonth = calendar.month(byAddingMonths: 1, to: month)
+      return .monthHeader(nextMonth)
     }
 
     case let .dayOfWeekInMonth(position, month):
@@ -142,8 +147,8 @@ final class LayoutItemTypeEnumerator {
       // TODO: - look into how this actually works
       let nextDay = calendar.day(byAddingDays: 1, to: day)
       if day.month != nextDay.month && shouldGenerateFooter {
-        return .monthFooter(nextDay.month)
-      } else if day == dayRange.upperBound {
+        return .monthFooter(day.month)
+      } else if day == dayRange.upperBound && shouldGenerateFooter {
         return .monthFooter(day.month)
       } else {
         return .day(nextDay)
@@ -162,4 +167,14 @@ final class LayoutItemTypeEnumerator {
     }
   }
 
+  private func lastDateInRange(in month: Month) -> Day {
+    let lastDate = calendar.lastDate(of: month)
+    let lastDay = calendar.day(containing: lastDate)
+
+    if month == dayRange.upperBound.month {
+      return max(lastDay, dayRange.upperBound)
+    } else {
+      return lastDay
+    }
+  }
 }

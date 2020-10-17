@@ -63,8 +63,12 @@ final class FrameProvider {
   // MARK: Month locations
 
   func originOfMonth(containing layoutItem: LayoutItem) -> CGPoint {
+    
     switch layoutItem.itemType {
-    case .monthHeader, .monthFooter:
+    case .monthHeader:
+      return layoutItem.frame.origin
+
+    case .monthFooter:
       return layoutItem.frame.origin
 
     case .dayOfWeekInMonth(let position, _):
@@ -133,8 +137,18 @@ final class FrameProvider {
     withFrame adjacentDayFrame: CGRect,
     inMonthWithOrigin monthOrigin: CGPoint
   ) -> CGRect {
-    let y = adjacentDayFrame.maxY + 20 + adjacentDayFrame.origin.y
-    return CGRect(x: 0, y: y, width: monthWidth, height: monthFooterHeight)
+    print("month: \(month)")
+    print("frame: \(adjacentDayFrame) point: \(monthOrigin) \(month)")
+    print("monthOrigin: \(monthOrigin)")
+    print("monthHeaderHeight: \(monthHeaderHeight)")
+    print("monthFooterHeight: \(monthFooterHeight)")
+    print("heightOfMonth(month): \(heightOfMonth(month))")
+    let y = monthOrigin.y +
+      monthHeaderHeight +
+      heightOfMonth(month)
+    let _newRect = CGRect(x: monthOrigin.x, y: y, width: monthWidth, height: monthFooterHeight)
+    print("newrect: \(_newRect)")
+    return _newRect
   }
 
   func frameOfDayOfWeek(

@@ -189,7 +189,6 @@ class SomeView: UIView {
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    print("here!!")
   }
 }
 
